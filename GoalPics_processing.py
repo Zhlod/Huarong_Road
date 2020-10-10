@@ -4,8 +4,8 @@ import os
 import sys
 import json
 
-path = 'code'
-r = os.listdir('code')
+path = 'GoalPic'
+r = os.listdir('GoalPic')
 imgs = []
 for lisst in r:
     imgs.append(os.path.join(path, lisst))

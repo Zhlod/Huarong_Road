@@ -8,7 +8,7 @@ import numpy as np
 import json
 import Pic_processing
 import game
-import sss
+import Move
 
 r = requests.get(r'http://47.102.118.1:8089/api/problem?stuid=031802137 ')
 f = open('Temp.jpg', 'wb')
@@ -35,7 +35,7 @@ print(empty)
 print(str1)
 print(str2)
 
-if sss.Solvable(str1,empty):
-    sss.sorrt(str1,str2,empty)
+if Move.Solvable(str1,empty):
+    Move.sorrt(str1,str2,empty)
 else:
     print('无解！')
