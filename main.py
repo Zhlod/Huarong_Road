@@ -28,10 +28,12 @@ def get_step(init_pos, goal_pos, empty_pos, empty_init_pos):
 
 
 def main():
+    if not os.path.exists('temp/'):
+        os.mkdir("temp") 
     while True:
         print("------------------载入中------------------")
         r = requests.get(r'http://47.102.118.1:8089/api/problem?stuid=031802137 ')
-        f = open('Init_Pic.jpg', 'wb')
+        f = open('temp/Init_Pic.jpg', 'wb')
         f.write(base64.b64decode(r.json()['img']))
         f.close()
 
