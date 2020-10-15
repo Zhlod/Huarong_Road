@@ -1,5 +1,7 @@
 # Python:
 __pycache__
+.vscode
 
 # Temp_files:
 temp
+Ranks.json

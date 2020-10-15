@@ -28,7 +28,7 @@ for img_path in imgs:
             temp = temp/22500
             data[temp[0]] = str(img_pos)
             img_pos += 1
-    total['path'] = img_path
+    total['name'] = img_path[8:-4]
     total['goal_pos'] = data
     die.append(total)
 

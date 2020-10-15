@@ -1,4 +1,5 @@
 import requests
+import os
 from PIL import Image
 import numpy as np
 import base64
@@ -83,6 +84,8 @@ def main(img):
 
 
 if __name__ == "__main__":
+    if not os.path.exists('temp/'):
+        os.mkdir("temp") 
     r = requests.get(r'http://47.102.118.1:8089/api/problem?stuid=031802137 ')
     f = open('temp/Init_Pic.jpg', 'wb')
     f.write(base64.b64decode(r.json()['img']))
