@@ -1,5 +1,7 @@
 # Python:
 __pycache__
+.vscode
 
 # Temp_files:
-temp
+AI_Competition/challenges.json
+AI_Competition/temp

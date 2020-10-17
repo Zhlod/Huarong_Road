@@ -1,12 +1,11 @@
 import queue
 
-
-def Path_search(mp, init_pos, goal_pos, empty):
+def Path_search(mp, init_pos, now_pos, empty):
     '''输出路径
     
     '''
     father = ''
-    child = goal_pos
+    child = now_pos
     path = []
     i = 0
     while(child != init_pos):
@@ -40,7 +39,6 @@ def Solvable(now_pos, empty):
                 continue
             if now_pos[i] > now_pos[j]:
                 count += 1
-    print('逆序数: ',count)
     if count % 2 == 0:
         return True
     else:
@@ -49,13 +47,11 @@ def Solvable(now_pos, empty):
 
 def get_empty_pos(now_pos, empty):
     '''遍历找出空白位置'''
-
     for i in range(len(now_pos)):
         if now_pos[i] == empty:
             return i
-
-
-def main(init_pos, goal_pos, empty):
+        
+def bfs(init_pos, empty):
     ''' 核心算法
     通过广搜找出最优解
     '''
@@ -72,9 +68,8 @@ def main(init_pos, goal_pos, empty):
         father_pos = q1.get()
         step = q2.get()
         pos = get_empty_pos(father_pos, empty)
-        if father_pos == goal_pos:
-            print(step)
-            return Path_search(mp, init_pos, goal_pos, empty)
+        if father_pos == '123456789':
+            return Path_search(mp,init_pos, father_pos,empty)
         for i in range(dir[pos]):
             child_pos = list(father_pos)
             child_pos[pos], child_pos[dis[pos][i]] = child_pos[dis[pos][i]], child_pos[pos]  # 移动空白
@@ -85,16 +80,3 @@ def main(init_pos, goal_pos, empty):
                 continue
             q1.put(child_pos)
             q2.put(step+1)
-
-
-if __name__ == "__main__":
-    a = '941628753'
-    b = '123456789'
-
-    print(Solvable('123687594','8'))
-    '''
-    if Solvable(a, '9'):
-        main(a, b, '9')
-    else:
-        print('无解！')
-    '''

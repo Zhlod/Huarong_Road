@@ -1,7 +1,5 @@
-import requests
 from PIL import Image
 import numpy as np
-import base64
 import json
 
 
@@ -41,7 +39,7 @@ def FindGoalPic(temp_data):
     目标图片的信息组成（一个字典）：键为每一小块的像素值，值为每一小块的目标位置
     通过逐一查找待处理图片每一小块的像素值与目标图片字典中不相同的小块个数，有且只有一个小块的像素值不一样的图片即为目标图片
     '''
-    with open('datas.json', 'r') as f:
+    with open('Goal_Pic_datas/datas.json', 'r') as f:
         goals = json.load(f)  # 读入所有目标图片的信息,goals是一个列表
     f.close()
 
@@ -72,7 +70,7 @@ def FindGoalPosition(temp_data, target_data):
         else:
             init_pos += target_data['goal_pos'][blanked]
 
-    return init_pos, target_data['path']
+    return init_pos, target_data['name']
 
 
 def main(img):
@@ -83,13 +81,4 @@ def main(img):
 
 
 if __name__ == "__main__":
-    r = requests.get(r'http://47.102.118.1:8089/api/problem?stuid=031802137 ')
-    f = open('temp/Init_Pic.jpg', 'wb')
-    f.write(base64.b64decode(r.json()['img']))
-    f.close()
-
-    im = Image.open('temp/Init_Pic.jpg')
-
-    init_pos, empty_pos, goal_img_path = main(im)
-
-    print(init_pos, empty_pos, goal_img_path)
+    pass

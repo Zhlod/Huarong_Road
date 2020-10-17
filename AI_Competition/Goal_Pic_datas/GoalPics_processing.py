@@ -4,8 +4,8 @@ import os
 import sys
 import json
 
-path = 'GoalPic'
-r = os.listdir('GoalPic')
+path = 'Goal_Pic'
+r = os.listdir('Goal_Pic')
 imgs = []
 for img_name in r:
     imgs.append(os.path.join(path, img_name))
@@ -28,7 +28,7 @@ for img_path in imgs:
             temp = temp/22500
             data[temp[0]] = str(img_pos)
             img_pos += 1
-    total['path'] = img_path
+    total['name'] = img_path[8:-4]
     total['goal_pos'] = data
     die.append(total)
 
