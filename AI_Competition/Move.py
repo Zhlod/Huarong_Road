@@ -98,13 +98,10 @@ def main(init_pos, empty, swap_step, swap_pos):
         return ''.join(path+Path),[]
     elif is_Solvable and step >= swap_step:
         init_pos, path = bfs(init_pos, empty, swap_step)
-        print(init_pos)
         init_pos = list(init_pos)
         init_pos[swap_pos[0]-1], init_pos[swap_pos[1]-1] = init_pos[swap_pos[1]-1], init_pos[swap_pos[0]-1]
         init_pos = ''.join(init_pos)
         is_Solvable = Solvable(init_pos, empty)
-        print(step)
-        print(init_pos)
         print(is_Solvable)
         if is_Solvable:
             init_pos, Path = bfs(init_pos,empty)
