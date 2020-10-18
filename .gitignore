@@ -5,4 +5,5 @@ __pycache__
 # Temp_files:
 AI_Competition/challenges.json
 AI_Competition/temp
-Game/Ranks.json
+Game/Ranks_3X3.json
+Game/Ranks_4X4.json
