@@ -7,22 +7,19 @@ import time
 import json
 import AI_Move
 
-if not os.path.exists('Game\Ranks.json'): # 判断有无Ranks文件
-    with open('Game\Ranks.json', 'w') as f:  # 读取排行榜信息
-        f.write(json.dumps([]))
-    Ranks =[]
-else:
-    with open('Game\Ranks.json', 'r') as f:  # 读取排行榜信息
-        Ranks = json.load(f)
+Ranks_3X3 = []
+Ranks_4X4 = []
 
+SHAPE = 4  # 棋盘大小(SHAPE * SHAPE)
 FPS = 60  # 刷新率
 CELL_SIZE = 100   # 方格大小
 MARGIN = 10  # 方格的margin
 PADDING = 10  # 方格的padding
-WIN_WIDTH = (CELL_SIZE + MARGIN) * 3 + MARGIN + 400  # 屏幕宽度
-WIN_HEIGHT = (CELL_SIZE + MARGIN) * 3 + MARGIN  # 屏幕高度
+WIN_WIDTH = (CELL_SIZE + MARGIN) * 4 + MARGIN + 200  # 屏幕宽度
+WIN_HEIGHT = (CELL_SIZE + MARGIN) * 4 + MARGIN  # 屏幕高度
 
 TITLE_COLOR = (0, 0, 0)  # 标题颜色
+HELP_COLOR = (0,0,0)  # 帮助颜色
 BACKGROUND_COLOR = (255, 218, 185)  # 背景颜色
 BUTTON_COLOR = (0, 200, 0)  # 按钮颜色
 BUTTON_CLICK_COLOR = (0, 255, 0)  # 按钮选中颜色
@@ -35,70 +32,104 @@ screen = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
 clock = pygame.time.Clock()
 
 
+def RANK_FILE():
+    '''读取排行榜文件，若无则创建
+    '''
+    global Ranks_3X3
+    global Ranks_4X4
+    if not os.path.exists('Game\Ranks_3X3.json'):  # 判断有无Ranks_3X3文件
+        with open('Game\Ranks_3X3.json', 'w') as f:  # 创建文件
+            f.write(json.dumps([]))
+    else:
+        with open('Game\Ranks_3X3.json', 'r') as f:  # 读取排行榜信息
+            Ranks_3X3 = json.load(f)
+
+    if not os.path.exists('Game\Ranks_4X4.json'):  # 判断有无Ranks_4X4文件
+        with open('Game\Ranks_4X4.json', 'w') as f:  # 创建文件
+            f.write(json.dumps([]))
+    else:
+        with open('Game\Ranks_4X4.json', 'r') as f:  # 读取排行榜信息
+            Ranks_4X4 = json.load(f)
+
+
 class Logic:  # 棋盘类
     def __init__(self):
-        self.shape = 3
-        self.empty_pos = 8  # 空白格所在位置, 空白格默认为 9
-        self.tiles = ['1', '2', '3', '4', '5', '6', '7', '8', '9']  # 棋盘当前序列
-        self.pos = [-3, -1, 1, 3]  # 定义方向矢量 s,d,a,w
+        self.shape = SHAPE  # 棋盘大小
+        self.empty_pos = SHAPE * SHAPE - 1  # 空白格所在位置, 空白格默认为右下角
+        self.tiles = []  # 棋盘当前序列
+        self.goal = []  # 棋盘目标序列
+        self.pos = [-SHAPE, -1, 1, SHAPE]  # 定义方向矢量 s,d,a,w
+        self.border = [[], [], [], []]  # 棋盘边界  上 左 下 右
         self.init_load()  # 初始化棋盘
 
     def init_load(self):
         '''初始化棋盘
         以正确序列为基础随机移动一千次
         '''
+
+        for i in range(self.shape*self.shape):  # 生成正确的棋盘序列
+            self.tiles.append(str(i+1))
+            self.goal.append(str(i+1))
+        #self.goal = self.tiles  (这是错误的方法, 这回导致goal与titles始终一样)
+
+        for i in range(2):  # 生成棋盘边界
+            mod1 = i*(self.shape-1)+1
+            mod2 = int(((self.shape-1)/mod1)*self.shape)
+            for j in range(self.shape):
+                self.border[i].append(mod1*j)
+                self.border[i+2].append(mod1*j+mod2)
+
         for count in range(1000):  # 随机移动一千次
             pos = random.choice(self.pos)  # 获取随机移动的方向
             spot = self.empty_pos + pos  # 移动后空白块的位置
-            if 0 <= spot and spot <= 8:  # 判断有无超出棋盘
-                if pos == -3 and self.empty_pos not in [0, 1, 2]:
-                    self.tiles[self.empty_pos], self.tiles[spot] = self.tiles[spot], self.tiles[self.empty_pos]
-                    self.empty_pos = spot
-                elif pos == -1 and self.empty_pos not in [0, 3, 6]:
-                    self.tiles[self.empty_pos], self.tiles[spot] = self.tiles[spot], self.tiles[self.empty_pos]
-                    self.empty_pos = spot
-                elif pos == 1 and self.empty_pos not in [2, 5, 8]:
-                    self.tiles[self.empty_pos], self.tiles[spot] = self.tiles[spot], self.tiles[self.empty_pos]
-                    self.empty_pos = spot
-                elif pos == 3 and self.empty_pos not in [6, 7, 8]:
-                    self.tiles[self.empty_pos], self.tiles[spot] = self.tiles[spot], self.tiles[self.empty_pos]
-                    self.empty_pos = spot
+            if pos == -self.shape and self.empty_pos not in self.border[0]:
+                self.tiles[self.empty_pos], self.tiles[spot] = self.tiles[spot], self.tiles[self.empty_pos]
+                self.empty_pos = spot
+            elif pos == -1 and self.empty_pos not in self.border[1]:
+                self.tiles[self.empty_pos], self.tiles[spot] = self.tiles[spot], self.tiles[self.empty_pos]
+                self.empty_pos = spot
+            elif pos == 1 and self.empty_pos not in self.border[3]:
+                self.tiles[self.empty_pos], self.tiles[spot] = self.tiles[spot], self.tiles[self.empty_pos]
+                self.empty_pos = spot
+            elif pos == self.shape and self.empty_pos not in self.border[2]:
+                self.tiles[self.empty_pos], self.tiles[spot] = self.tiles[spot], self.tiles[self.empty_pos]
+                self.empty_pos = spot
 
     def move(self, pos):
         '''移动函数，原理与初始化棋盘函数相同
         '''
         pos = self.pos[pos]  # 获取随机移动的方向
         spot = self.empty_pos + pos  # 移动后空白块的位置
-        if 0 <= spot and spot <= 8:  # 判断有无超出棋盘
-            if pos == -3 and self.empty_pos not in [0, 1, 2]:
-                self.tiles[self.empty_pos], self.tiles[spot] = self.tiles[spot], self.tiles[self.empty_pos]
-                self.empty_pos = spot
-            elif pos == -1 and self.empty_pos not in [0, 3, 6]:
-                self.tiles[self.empty_pos], self.tiles[spot] = self.tiles[spot], self.tiles[self.empty_pos]
-                self.empty_pos = spot
-            elif pos == 1 and self.empty_pos not in [2, 5, 8]:
-                self.tiles[self.empty_pos], self.tiles[spot] = self.tiles[spot], self.tiles[self.empty_pos]
-                self.empty_pos = spot
-            elif pos == 3 and self.empty_pos not in [6, 7, 8]:
-                self.tiles[self.empty_pos], self.tiles[spot] = self.tiles[spot], self.tiles[self.empty_pos]
-                self.empty_pos = spot
+        if pos == -self.shape and self.empty_pos not in self.border[0]:
+            self.tiles[self.empty_pos], self.tiles[spot] = self.tiles[spot], self.tiles[self.empty_pos]
+            self.empty_pos = spot
+        elif pos == -1 and self.empty_pos not in self.border[1]:
+            self.tiles[self.empty_pos], self.tiles[spot] = self.tiles[spot], self.tiles[self.empty_pos]
+            self.empty_pos = spot
+        elif pos == 1 and self.empty_pos not in self.border[3]:
+            self.tiles[self.empty_pos], self.tiles[spot] = self.tiles[spot], self.tiles[self.empty_pos]
+            self.empty_pos = spot
+        elif pos == self.shape and self.empty_pos not in self.border[2]:
+            self.tiles[self.empty_pos], self.tiles[spot] = self.tiles[spot], self.tiles[self.empty_pos]
+            self.empty_pos = spot
 
     def is_win(self):
         '''判断胜利
         '''
-        if self.tiles == ['1', '2', '3', '4', '5', '6', '7', '8', '9']:
+        if self.tiles == self.goal:
             return True
 
     def draw_num(self):
         '''绘制棋盘
-        先绘制方格，再绘制数字，'9'为空白块不绘制数字
+        先绘制方格，再绘制数字，右下角为空白块不绘制数字
         '''
+        empty_num = str(self.shape * self.shape)
         i = 0
         for r in range(self.shape):  # 第几列
             for c in range(self.shape):  # 第几行
                 num = self.tiles[i]
                 i += 1
-                if num != '9':  # 设置方格颜色，空白块与其他不同
+                if num != empty_num:  # 设置方格颜色，空白块与其他不同
                     color = BACKGROUND_CELL_COLOR
                 else:
                     color = BACKGROUND_EMPTY_CELL_COLOR
@@ -106,7 +137,7 @@ class Logic:  # 棋盘类
                 x = MARGIN * (c + 1) + c * CELL_SIZE
                 y = MARGIN * (r + 1) + r * CELL_SIZE
                 pygame.draw.rect(screen, color, (x, y, CELL_SIZE, CELL_SIZE))
-                if num != '9':  # 给非空白块绘制数字
+                if num != empty_num:  # 给非空白块绘制数字
                     font_size = int((CELL_SIZE - PADDING) / 1.3)
                     font = pygame.font.SysFont('arialBlod', font_size)
                     font_width, font_height = font.size(num)
@@ -156,7 +187,7 @@ def button(msg, x, y, w, h, ic, ac, action=None, logic=None):
     return True
 
 
-def game_win(logic, text='You Win!'):
+def game_win(logic, text='Win!'):
     '''获胜显示
             You Win!
          'ESC' to quit
@@ -205,9 +236,10 @@ def press(is_game_over, logic, COUNT, seconds):
         return seconds
 
 
-def RANK():
-    '''排行榜
+def RANK_3X3():
+    '''3X3排行榜
     '''
+    global Ranks_3X3
     pygame.display.set_caption('排行榜')
     Switch = True
     while Switch:
@@ -217,15 +249,42 @@ def RANK():
                 sys.exit()
         screen.fill(BACKGROUND_COLOR)
         i = 0
-        for y in range(len(Ranks)):  # 8个为一列
+        for y in range(len(Ranks_3X3)):  # 11个为一列
+            x = y // 11
+            y = y % 11
+            RankText = pygame.font.SysFont(None, 40)
+            RankText_Surf = RankText.render(
+                str(i+1)+'.  '+str(Ranks_3X3[i])+'s', True, BUTTON_TXT_COLOR)
+            screen.blit(RankText_Surf, (MARGIN + 150 * x, MARGIN*(y+1) + 30*y))
+            i += 1
+        Switch = button("QUIT", 490, WIN_HEIGHT//2-25, 100, 50, BUTTON_COLOR,
+                        BUTTON_CLICK_COLOR, Return_Start)
+        pygame.display.update()
+        clock.tick(FPS)
+
+
+def RANK_4X4():
+    '''4X4排行榜
+    '''
+    global Ranks_4X4
+    pygame.display.set_caption('排行榜')
+    Switch = True
+    while Switch:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+        screen.fill(BACKGROUND_COLOR)
+        i = 0
+        for y in range(len(Ranks_4X4)):  # 8个为一列
             x = y // 8
             y = y % 8
             RankText = pygame.font.SysFont(None, 30)
             RankText_Surf = RankText.render(
-                str(i+1)+'.  '+str(Ranks[i])+'s', True, BUTTON_TXT_COLOR)
+                str(i+1)+'.  '+str(Ranks_4X4[i])+'s', True, BUTTON_TXT_COLOR)
             screen.blit(RankText_Surf, (MARGIN + 100 * x, MARGIN*(y+1) + 30*y))
             i += 1
-        Switch = button("QUIT", 550, 150, 100, 50, BUTTON_COLOR,
+        Switch = button("QUIT", 490, WIN_HEIGHT//2-25, 100, 50, BUTTON_COLOR,
                         BUTTON_CLICK_COLOR, Return_Start)
         pygame.display.update()
         clock.tick(FPS)
@@ -256,10 +315,12 @@ def AI(logic):
     return False
 
 
-def Game_Loop():
-    '''游戏界面
+def Game_Loop_3X3():
+    '''3X3游戏界面
     '''
-    global Ranks
+    global Ranks_3X3
+    global SHAPE
+    SHAPE = 3
     pygame.display.set_caption('数字华容道 -- 0')
     logic = Logic()  # 定义棋盘
     COUNT = pygame.USEREVENT + 1  # 自定义计时事件
@@ -268,12 +329,12 @@ def Game_Loop():
     Switch = True
     while Switch:
         if logic.is_win():  # 判断游戏是否胜利
-            Ranks.append(seconds)  # 添加排行榜记录
-            Ranks.sort()  # 降序排序
-            if len(Ranks) > 20:  # 最多存20个数据
-                Ranks = Ranks[:20]
-            with open('Game\Ranks.json', 'w') as f:  # 写入文件
-                f.write(json.dumps(Ranks))
+            Ranks_3X3.append(seconds)  # 添加排行榜记录
+            Ranks_3X3.sort()  # 降序排序
+            if len(Ranks_3X3) > 22:  # 最多存22个数据
+                Ranks_3X3 = Ranks_3X3[:22]
+            with open('Game\Ranks_3X3.json', 'w') as f:  # 写入文件
+                f.write(json.dumps(Ranks_3X3))
             game_win(logic, text='Time: '+str(seconds))
             break
         seconds = press(False, logic, COUNT, seconds)  # 监控按键
@@ -281,9 +342,80 @@ def Game_Loop():
             break
         screen.fill(BACKGROUND_COLOR)
         logic.draw_num()  # 绘制棋盘
-        if button("AI", 420, 150, 100, 50, BUTTON_COLOR, BUTTON_CLICK_COLOR, AI, logic) == False:
+        if button("AI", 120, 370, 100, 50, BUTTON_COLOR, BUTTON_CLICK_COLOR, AI, logic) == False:
             break
-        Switch = button("QUIT", 550, 150, 100, 50, BUTTON_COLOR,
+        Switch = button("QUIT", 490, WIN_HEIGHT//2-25, 100, 50, BUTTON_COLOR,
+                        BUTTON_CLICK_COLOR, Return_Start)
+        pygame.display.update()
+        clock.tick(FPS)
+
+
+def Game_Loop_4X4():
+    '''4X4游戏界面
+    '''
+    global Ranks_4X4
+    global SHAPE
+    SHAPE = 4
+    pygame.display.set_caption('数字华容道 -- 0')
+    logic = Logic()  # 定义棋盘
+    COUNT = pygame.USEREVENT + 1  # 自定义计时事件
+    pygame.time.set_timer(COUNT, 1000)  # 每1s发生一次计时事件
+    seconds = 0  # 记录时间
+    Switch = True
+    while Switch:
+        if logic.is_win():  # 判断游戏是否胜利
+            Ranks_4X4.append(seconds)  # 添加排行榜记录
+            Ranks_4X4.sort()  # 降序排序
+            if len(Ranks_4X4) > 22:  # 最多存22个数据
+                Ranks_4X4 = Ranks_4X4[:22]
+            with open('Game\Ranks_4X4.json', 'w') as f:  # 写入文件
+                f.write(json.dumps(Ranks_4X4))
+            game_win(logic, text='Time: '+str(seconds))
+            break
+        seconds = press(False, logic, COUNT, seconds)  # 监控按键
+        if type(seconds) == bool:
+            break
+        screen.fill(BACKGROUND_COLOR)
+        logic.draw_num()  # 绘制棋盘
+        Switch = button("QUIT", 490, WIN_HEIGHT//2-25, 100, 50, BUTTON_COLOR,
+                        BUTTON_CLICK_COLOR, Return_Start)
+        pygame.display.update()
+        clock.tick(FPS)
+
+
+def jump_3X3_4X4():
+    pygame.display.set_caption('数字华容道')
+    Switch = True
+    while Switch:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+        screen.fill(BACKGROUND_COLOR)
+        button("3X3", 275, 100, 100, 50, BUTTON_COLOR,
+               BUTTON_CLICK_COLOR, Game_Loop_3X3)
+        button("4X4", 275, 200, 100, 50, BUTTON_COLOR,
+               BUTTON_CLICK_COLOR, Game_Loop_4X4)
+        Switch = button("QUIT", 275, 300, 100, 50, BUTTON_COLOR,
+                        BUTTON_CLICK_COLOR, Return_Start)
+        pygame.display.update()
+        clock.tick(FPS)
+
+
+def Rank_3X3_4X4():
+    pygame.display.set_caption('排行榜')
+    Switch = True
+    while Switch:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+        screen.fill(BACKGROUND_COLOR)
+        button("3X3", 275, 100, 100, 50, BUTTON_COLOR,
+               BUTTON_CLICK_COLOR, RANK_3X3)
+        button("4X4", 275, 200, 100, 50, BUTTON_COLOR,
+               BUTTON_CLICK_COLOR, RANK_4X4)
+        Switch = button("QUIT", 275, 300, 100, 50, BUTTON_COLOR,
                         BUTTON_CLICK_COLOR, Return_Start)
         pygame.display.update()
         clock.tick(FPS)
@@ -292,8 +424,12 @@ def Game_Loop():
 def Game_Start():
     '''主菜单
     '''
+    RANK_FILE()  # 读取排行榜文件
     title = pygame.font.SysFont(None, 100)
     title_width, title_height = title.size('Digital Push')
+
+    Help1 = pygame.font.SysFont(None, 50)
+    Help2 = pygame.font.SysFont(None, 50)
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -302,12 +438,16 @@ def Game_Start():
         pygame.display.set_caption('数字华容道')
         screen.fill(BACKGROUND_COLOR)
         screen.blit(title.render('Digital Push', True, TITLE_COLOR), ((
-            WIN_WIDTH - title_width)//2, (WIN_HEIGHT - title_height)//3))
-        button("START", 120, 250, 100, 50, BUTTON_COLOR,
-               BUTTON_CLICK_COLOR, Game_Loop)
-        button("RANK", 320, 250, 100, 50,
-               BUTTON_COLOR, BUTTON_CLICK_COLOR, RANK)
-        button("QUIT", 520, 250, 100, 50, BUTTON_COLOR,
+            WIN_WIDTH - title_width)//2, (WIN_HEIGHT - title_height)//4))
+        screen.blit(Help1.render('Press w, a, s, d,', True, HELP_COLOR), ((
+            100, 240)))
+        screen.blit(Help2.render('to move blank', True, HELP_COLOR), ((
+            100, 290)))
+        button("START", 425, 200, 100, 50, BUTTON_COLOR,
+               BUTTON_CLICK_COLOR, jump_3X3_4X4)
+        button("RANK", 425, 270, 100, 50,
+               BUTTON_COLOR, BUTTON_CLICK_COLOR, Rank_3X3_4X4)
+        button("QUIT", 425, 340, 100, 50, BUTTON_COLOR,
                BUTTON_CLICK_COLOR, Quit_Game)
         pygame.display.update()
         clock.tick(FPS)
