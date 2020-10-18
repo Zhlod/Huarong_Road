@@ -26,9 +26,9 @@ def colors(im):
 
             if (temp == np.array([255., 255., 255.])).all():  # 纯白即为空白块
                 empty_pos = i
-                croped.save('temp/'+str(i)+'.jpg')
+                croped.save('AI_Competition/temp/'+str(i)+'.jpg')
             else:
-                croped.save('temp/'+str(i)+'.jpg')
+                croped.save('AI_Competition/temp/'+str(i)+'.jpg')
             i += 1
     return data, empty_pos
 
@@ -39,7 +39,7 @@ def FindGoalPic(temp_data):
     目标图片的信息组成（一个字典）：键为每一小块的像素值，值为每一小块的目标位置
     通过逐一查找待处理图片每一小块的像素值与目标图片字典中不相同的小块个数，有且只有一个小块的像素值不一样的图片即为目标图片
     '''
-    with open('Goal_Pic_datas/datas.json', 'r') as f:
+    with open('AI_Competition\Goal_Pic_datas\datas.json', 'r') as f:
         goals = json.load(f)  # 读入所有目标图片的信息,goals是一个列表
     f.close()
 

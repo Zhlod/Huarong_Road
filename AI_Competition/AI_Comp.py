@@ -31,15 +31,15 @@ def POST_Create(url, params_POST_create, token):
         {
             "teamid": 42,
             "data": {
-                "letter": "H",
-                "exclude": 7,
+                "letter": "A",
+                "exclude": 3,
                 "challenge": [
                     [8, 9, 6],
-                    [5, 0, 1],
-                    [4, 2, 3]
+                    [5, 7, 1],
+                    [4, 2, 0]
                 ],
-                "step": 15,
-                "swap": [1, 9]
+                "step": 0,
+                "swap": [1, 2]
             },
             "token": token
         }
@@ -94,7 +94,6 @@ if __name__ == "__main__":
     '''获得总排行榜
     GET_All_Rank(url,params_GET_all_rank)
     '''
-    
 
     ''' 获得我们的排行榜
     rank = GET_Rank(url,params_GET_rank)
@@ -115,43 +114,34 @@ if __name__ == "__main__":
 
     '''获取未通过赛题
     challenges = GET_NOT_DO(url,params_GET_NOT_DO,'42')
-    
-    for i in range(8,len(challenges)):
-        print("------------------载入中------------------")
-        print('赛题uuid：',challenges[i]['uuid'])
-        print('第',i,'题')
-        start = POST_start(url, params_POST_start,challenges[i]['uuid'] , token) 
-        print('剩余挑战次数：',start['chanceleft'])
-        path, swap_pos = main.main(start['data']['img'],start['data']['step'],start['data']['swap'])
-        POST_submit(url, params_POST_submit, token,start['uuid'],path,swap_pos)
-        print(path, swap_pos)
+    r = json.dumps(challenges,indent=4)
+    with open('AI_Competition\challenges.json','w') as f:
+        f.write(r)
     '''
 
     ''' 获取全部赛题
     challenges = GET_Challenges(url,params_GET_challenges)
     r = json.dumps(challenges,indent=4)
-    with open('challenges.json','w') as f:
+    with open('AI_Competition\challenges.json','w') as f:
         f.write(r)
     '''
-    '''                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
+    '''手动输入赛题uuid解题
     print("------------------载入中------------------")
-    print('赛题uuid：',challenges[2]['uuid'])
-    start = POST_start(url, params_POST_start,challenges[2]['uuid'] , token) 
+    uuid = '13029caf-17f9-4f62-adbd-bcfbc6d2a373'  # 指定题目的uuid
+    print('赛题uuid：',uuid)
+    start = POST_start(url, params_POST_start,uuid , token) 
     print('剩余挑战次数：',start['chanceleft'])
+    print('挑战uuid：',start['uuid'])
     path, swap_pos = main.main(start['data']['img'],start['data']['step'],start['data']['swap'])
     POST_submit(url, params_POST_submit, token,start['uuid'],path,swap_pos)
     print(path, swap_pos)
     '''
-    #GET_record(url,params_GET_record,'9f156155-403d-42a2-be6b-48facbde1fca')
 
+    '''获取解出指定题目的队伍数据
+    uuid = ''  # 指定题目的uuid
+    GET_record(url,params_GET_record,uuid)
+    '''
 
     ''' 创建赛题
-    POST_Create(url, params_POST_create, token)
-    '''
-
-
-    
-
-    '''
-    POST_submit(url, params_POST_submit, token,uuid,path,swap)
+    print(POST_Create(url, params_POST_create, token))
     '''

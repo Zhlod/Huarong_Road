@@ -71,7 +71,7 @@ def bfs(init_pos, empty, stop_step=100000):
     while(not q1.empty()):
         father_pos = q1.get()
         step = q2.get()
-        if step == stop_step-1:
+        if step == stop_step:
             return father_pos, Path_search(mp,init_pos, father_pos,empty)
         pos = get_empty_pos(father_pos, empty)
         if father_pos == '123456789':
@@ -89,13 +89,11 @@ def bfs(init_pos, empty, stop_step=100000):
 
 def main(init_pos, empty, swap_step, swap_pos):
     is_Solvable = Solvable(init_pos, empty)
-    if swap_step == 0:
-        swap_step = 1
     if is_Solvable:
         init_pos, path = bfs(init_pos, empty)
     print(is_Solvable)
     if is_Solvable and step < swap_step:
-        return ''.join(path+Path),[]
+        return ''.join(path),[]
     elif is_Solvable and step >= swap_step:
         init_pos, path = bfs(init_pos, empty, swap_step)
         init_pos = list(init_pos)

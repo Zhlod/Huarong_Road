@@ -1,20 +1,24 @@
 import os
+import queue
 import base64
+from PIL import Image
+import numpy as np
+import json
 import Pic_processing
 import Move
 
 def init_img():
-    im = Image.open('temp/Init_Pic.jpg')
+    im = Image.open('AI_Competition/temp/Init_Pic.jpg')
     init_pos, empty_pos, goal_img_path = Pic_processing.main(im)
     empty = init_pos[empty_pos]  # 找出空白块的目标位置
     return init_pos, empty, empty_pos, goal_img_path
 
 
 def main(img_path, step, swap):
-    if not os.path.exists('temp/'):
-        os.mkdir("temp") 
+    if not os.path.exists('AI_Competition/temp/'):
+        os.mkdir("AI_Competition/temp") 
 
-    f = open('temp/Init_Pic.jpg', 'wb')
+    f = open('AI_Competition/temp/Init_Pic.jpg', 'wb')
     f.write(base64.b64decode(img_path))
     f.close()
 

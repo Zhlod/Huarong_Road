@@ -7,12 +7,12 @@ import time
 import json
 import AI_Move
 
-if not os.path.exists('Ranks.json'): # 判断有无Ranks文件
-    with open('Ranks.json', 'w') as f:  # 读取排行榜信息
+if not os.path.exists('Game\Ranks.json'): # 判断有无Ranks文件
+    with open('Game\Ranks.json', 'w') as f:  # 读取排行榜信息
         f.write(json.dumps([]))
     Ranks =[]
 else:
-    with open('Ranks.json', 'r') as f:  # 读取排行榜信息
+    with open('Game\Ranks.json', 'r') as f:  # 读取排行榜信息
         Ranks = json.load(f)
 
 FPS = 60  # 刷新率
@@ -272,7 +272,7 @@ def Game_Loop():
             Ranks.sort()  # 降序排序
             if len(Ranks) > 20:  # 最多存20个数据
                 Ranks = Ranks[:20]
-            with open('Ranks.json', 'w') as f:  # 写入文件
+            with open('Game\Ranks.json', 'w') as f:  # 写入文件
                 f.write(json.dumps(Ranks))
             game_win(logic, text='Time: '+str(seconds))
             break
