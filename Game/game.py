@@ -19,7 +19,7 @@ WIN_WIDTH = (CELL_SIZE + MARGIN) * 4 + MARGIN + 200  # 屏幕宽度
 WIN_HEIGHT = (CELL_SIZE + MARGIN) * 4 + MARGIN  # 屏幕高度
 
 TITLE_COLOR = (0, 0, 0)  # 标题颜色
-HELP_COLOR = (0,0,0)  # 帮助颜色
+TIP_COLOR = (0,0,0)  # 帮助颜色
 BACKGROUND_COLOR = (255, 218, 185)  # 背景颜色
 BUTTON_COLOR = (0, 200, 0)  # 按钮颜色
 BUTTON_CLICK_COLOR = (0, 255, 0)  # 按钮选中颜色
@@ -240,7 +240,7 @@ def RANK_3X3():
     '''3X3排行榜
     '''
     global Ranks_3X3
-    pygame.display.set_caption('排行榜')
+    pygame.display.set_caption('3X3排行榜')
     Switch = True
     while Switch:
         for event in pygame.event.get():
@@ -267,7 +267,7 @@ def RANK_4X4():
     '''4X4排行榜
     '''
     global Ranks_4X4
-    pygame.display.set_caption('排行榜')
+    pygame.display.set_caption('4X4排行榜')
     Switch = True
     while Switch:
         for event in pygame.event.get():
@@ -276,9 +276,9 @@ def RANK_4X4():
                 sys.exit()
         screen.fill(BACKGROUND_COLOR)
         i = 0
-        for y in range(len(Ranks_4X4)):  # 8个为一列
-            x = y // 8
-            y = y % 8
+        for y in range(len(Ranks_4X4)):  # 11个为一列
+            x = y // 11
+            y = y % 11
             RankText = pygame.font.SysFont(None, 30)
             RankText_Surf = RankText.render(
                 str(i+1)+'.  '+str(Ranks_4X4[i])+'s', True, BUTTON_TXT_COLOR)
@@ -295,9 +295,14 @@ def AI(logic):
     获取当前棋盘序列信息，传入Move模块获取最有解步骤，
     AI按步骤执行
     '''
+    pygame.display.set_caption('AI演示')
+    tip = pygame.font.SysFont(None,WIN_WIDTH // 4)
+    tip_width, tip_height = tip.size('--loading--')
+    screen.blit(tip.render('--loading--', True, TIP_COLOR), ((
+            WIN_WIDTH - tip_width) // 2, (WIN_HEIGHT - tip_height) // 2))
+    pygame.display.update()
     init_pos = ''.join(logic.tiles)  # 将序列转换为字符串
     step = AI_Move.bfs(init_pos, '9')  # 获取最优解步骤
-    print(step)
     for i in step:
         if i == 'w':
             logic.move(0)
@@ -331,8 +336,8 @@ def Game_Loop_3X3():
         if logic.is_win():  # 判断游戏是否胜利
             Ranks_3X3.append(seconds)  # 添加排行榜记录
             Ranks_3X3.sort()  # 降序排序
-            if len(Ranks_3X3) > 22:  # 最多存22个数据
-                Ranks_3X3 = Ranks_3X3[:22]
+            if len(Ranks_3X3) > 33:  # 最多存33个数据
+                Ranks_3X3 = Ranks_3X3[:33]
             with open('Game\Ranks_3X3.json', 'w') as f:  # 写入文件
                 f.write(json.dumps(Ranks_3X3))
             game_win(logic, text='Time: '+str(seconds))
@@ -366,8 +371,8 @@ def Game_Loop_4X4():
         if logic.is_win():  # 判断游戏是否胜利
             Ranks_4X4.append(seconds)  # 添加排行榜记录
             Ranks_4X4.sort()  # 降序排序
-            if len(Ranks_4X4) > 22:  # 最多存22个数据
-                Ranks_4X4 = Ranks_4X4[:22]
+            if len(Ranks_4X4) > 33:  # 最多存33个数据
+                Ranks_4X4 = Ranks_4X4[:33]
             with open('Game\Ranks_4X4.json', 'w') as f:  # 写入文件
                 f.write(json.dumps(Ranks_4X4))
             game_win(logic, text='Time: '+str(seconds))
@@ -439,9 +444,9 @@ def Game_Start():
         screen.fill(BACKGROUND_COLOR)
         screen.blit(title.render('Digital Push', True, TITLE_COLOR), ((
             WIN_WIDTH - title_width)//2, (WIN_HEIGHT - title_height)//4))
-        screen.blit(Help1.render('Press w, a, s, d,', True, HELP_COLOR), ((
+        screen.blit(Help1.render('Press w, a, s, d,', True, TIP_COLOR), ((
             100, 240)))
-        screen.blit(Help2.render('to move blank', True, HELP_COLOR), ((
+        screen.blit(Help2.render('to move blank', True, TIP_COLOR), ((
             100, 290)))
         button("START", 425, 200, 100, 50, BUTTON_COLOR,
                BUTTON_CLICK_COLOR, jump_3X3_4X4)
