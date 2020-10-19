@@ -3,7 +3,9 @@ __pycache__
 .vscode
 
 # Temp_files:
-AI_Competition/challenges.json
+AI_Competition/challenges_not.json
+AI_Competition/challenges_all.json
 AI_Competition/temp
+AI_Competition/TestReport.html
 Game/Ranks_3X3.json
 Game/Ranks_4X4.json
