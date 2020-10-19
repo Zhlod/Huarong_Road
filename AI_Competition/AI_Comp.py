@@ -3,30 +3,38 @@ import json
 import main
 
 def GET_Challenges(url, params_GET_challenges):
+    '''获取所有赛题'''
     r = requests.get(url+params_GET_challenges)
     return r.json()
 
 def GET_NOT_DO(url, params_GET_NOT_DO,tid):
+    '''获取未挑战或挑战失败的赛题'''
     r = requests.get(url+params_GET_NOT_DO+tid)
     return r.json()
 
 def GET_record(url, params_GET_record,uuid):
+    '''获取解出指定题目的队伍数据'''
     r = requests.get(url+params_GET_record+uuid)
     for i in r.json():
         print(i)
 
 def GET_All_Rank(url, params_GET_all_rank):
+    '''获取总排行榜'''
     r = requests.get(url+params_GET_all_rank)
     for i in r.json():
         print(i)
     
 
-def GET_Rank(url, params_GET_rank):
+def GET_My_Rank(url, params_GET_rank):
+    '''获取本组参赛信息'''
     r = requests.get(url+params_GET_rank)
     return r.json()
 
 
 def POST_Create(url, params_POST_create, token):
+    '''创建并提交自建赛题
+       手动修改赛题信息
+    '''
     s = json.dumps(
         {
             "teamid": 42,
@@ -49,6 +57,7 @@ def POST_Create(url, params_POST_create, token):
 
 
 def POST_start(url, params_POST_start, uuid, token):
+    '''获取指定赛题数据'''
     s = json.dumps(
         {
             "teamid": 42,
@@ -60,6 +69,7 @@ def POST_start(url, params_POST_start, uuid, token):
 
 
 def POST_submit(url, params_POST_submit, token,uuid,path,swap):
+    '''提交指定赛题的答案'''
     s = json.dumps(
         {
             "uuid": uuid,
@@ -82,21 +92,21 @@ if __name__ == "__main__":
     token = '7cff3bc5-f3bf-42a4-932a-aa970a82aa9a'
     team_id = 42
     url = 'http://47.102.118.1:8089/'
-    params_GET_challenges = 'api/challenge/list'
-    params_GET_rank = 'api/teamdetail/42'
-    params_GET_all_rank = 'api/rank'
-    params_GET_NOT_DO = 'api/team/problem/'
-    params_POST_create = 'api/challenge/create'
-    params_POST_start = 'api/challenge/start/'
-    params_POST_submit = 'api/challenge/submit'
-    params_GET_record = 'api/challenge/record/'
+    params_GET_challenges = 'api/challenge/list'  # 所有赛题
+    params_GET_rank = 'api/teamdetail/42'  # 本队信息
+    params_GET_all_rank = 'api/rank'  # 总榜
+    params_GET_NOT_DO = 'api/team/problem/'  # 未挑战或未通过赛题
+    params_POST_create = 'api/challenge/create'  # 创建赛题
+    params_POST_start = 'api/challenge/start/'  # 获取赛题信息
+    params_POST_submit = 'api/challenge/submit'  # 提交答案
+    params_GET_record = 'api/challenge/record/'  # 获取解开某题队伍信息
 
     '''获得总排行榜
     GET_All_Rank(url,params_GET_all_rank)
     '''
 
     ''' 获得我们的排行榜
-    rank = GET_Rank(url,params_GET_rank)
+    rank = GET_My_Rank(url,params_GET_rank)
     print('rank:',rank['rank'])
     print('score:',rank['score'])
     print('success:')
@@ -112,22 +122,23 @@ if __name__ == "__main__":
     
 
 
-    '''获取未通过赛题
+    '''获取为挑战或未通过赛题,并存为文件
     challenges = GET_NOT_DO(url,params_GET_NOT_DO,'42')
     r = json.dumps(challenges,indent=4)
-    with open('AI_Competition\challenges.json','w') as f:
+    with open('AI_Competition\challenges_not.json','w') as f:
         f.write(r)
     '''
 
-    ''' 获取全部赛题
+    ''' 获取全部赛题,并存为文件
     challenges = GET_Challenges(url,params_GET_challenges)
     r = json.dumps(challenges,indent=4)
-    with open('AI_Competition\challenges.json','w') as f:
+    with open('AI_Competition\challenges_all.json','w') as f:
         f.write(r)
     '''
+
     '''手动输入赛题uuid解题
     print("------------------载入中------------------")
-    uuid = '13029caf-17f9-4f62-adbd-bcfbc6d2a373'  # 指定题目的uuid
+    uuid = 'cb2337fa-cc56-4d15-9942-e2471d95ff96'  # 指定题目的uuid
     print('赛题uuid：',uuid)
     start = POST_start(url, params_POST_start,uuid , token) 
     print('剩余挑战次数：',start['chanceleft'])

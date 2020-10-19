@@ -91,7 +91,7 @@ def main(init_pos, empty, swap_step, swap_pos):
     is_Solvable = Solvable(init_pos, empty)
     if is_Solvable:
         init_pos, path = bfs(init_pos, empty)
-    print(is_Solvable)
+    #print(is_Solvable)
     if is_Solvable and step < swap_step:
         return ''.join(path),[]
     elif is_Solvable and step >= swap_step:
@@ -100,7 +100,7 @@ def main(init_pos, empty, swap_step, swap_pos):
         init_pos[swap_pos[0]-1], init_pos[swap_pos[1]-1] = init_pos[swap_pos[1]-1], init_pos[swap_pos[0]-1]
         init_pos = ''.join(init_pos)
         is_Solvable = Solvable(init_pos, empty)
-        print(is_Solvable)
+        #print(is_Solvable)
         if is_Solvable:
             init_pos, Path = bfs(init_pos,empty)
             return ''.join(path+Path),[]
@@ -116,7 +116,7 @@ def main(init_pos, empty, swap_step, swap_pos):
         init_pos[swap_pos[0]-1], init_pos[swap_pos[1]-1] = init_pos[swap_pos[1]-1], init_pos[swap_pos[0]-1]
         init_pos = ''.join(init_pos)
         is_Solvable = Solvable(init_pos, empty)
-        print(is_Solvable)
+        #print(is_Solvable)
         if is_Solvable:
             init_pos, Path = bfs(init_pos,empty)
             return ''.join(path+Path),[]
@@ -133,7 +133,7 @@ def main(init_pos, empty, swap_step, swap_pos):
 
 
 if __name__ == "__main__":
-    a = '135987264'
-    path, swap_pos = main(a,'5',19,[1,2])
+    a = '278641539'
+    path, swap_pos = main(a,'9',19,[1,2])
     print(path, swap_pos)
     
