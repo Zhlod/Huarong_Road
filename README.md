@@ -1,6 +1,7 @@
 ![maven](https://img.shields.io/badge/Language-Python3-green)
 
 Game文件夹为游戏文件
+
 AI_Competition文件夹为AI大比拼文件
 
 ### Game部分使用
