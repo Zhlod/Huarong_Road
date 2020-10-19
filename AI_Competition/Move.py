@@ -1,4 +1,5 @@
 import queue
+import cProfile
 
 step = 0
 def Path_search(mp, init_pos, now_pos, empty):
@@ -99,7 +100,7 @@ def main(init_pos, empty, swap_step, swap_pos):
     '''
     is_Solvable = Solvable(init_pos, empty)  # 判断初始有无解
     if is_Solvable:  # 初始有解则计算最优解步数
-        bfs(init_pos, empty)
+        init_pos, path = bfs(init_pos, empty)
     #print(is_Solvable)
     if is_Solvable and step < swap_step:  # 初始有解, 且最优解步数 < 交换发生步数
         return ''.join(path),[]
@@ -143,6 +144,5 @@ def main(init_pos, empty, swap_step, swap_pos):
 
 if __name__ == "__main__":
     a = '278641539'
-    path, swap_pos = main(a,'9',19,[1,2])
-    print(path, swap_pos)
+    cProfile.run('main(a,"9",19,[1,2])')
     

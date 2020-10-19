@@ -1,6 +1,7 @@
 from PIL import Image
 import numpy as np
 import json
+import cProfile
 
 
 def crop(im):
@@ -84,4 +85,5 @@ def main(img):
 
 
 if __name__ == "__main__":
-    pass
+    im = Image.open('AI_Competition/temp/Init_Pic.jpg')
+    cProfile.run('main(im)')
