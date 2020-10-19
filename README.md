@@ -12,7 +12,7 @@ pip install -r requirements.txt
 ```
 安装完后再命令行下输入
 ```
-python game.py
+python Game/game.py
 ```
 开始游戏
 
